@@ -20,7 +20,7 @@ SECRET_KEY = get_env('DJANGO_SECRET_KEY', 'dev-insecure-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env('DJANGO_DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost,127.0.0.1,awd-data-2lbb.onrender.com').split(',')
 CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if h and not h.startswith('localhost') and not h.startswith('127.0.0.1')]
 
 

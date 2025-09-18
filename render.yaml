@@ -7,7 +7,7 @@ services:
       pip install -r requirements.txt
       python manage.py migrate --noinput
       python manage.py collectstatic --noinput
-    startCommand: gunicorn myproject.wsgi:application --bind 0.0.0.0:$PORT
+  startCommand: gunicorn myproject.wsgi:application --bind 0.0.0.0:$PORT
     autoDeploy: true
     envVars:
       - key: DJANGO_SECRET_KEY

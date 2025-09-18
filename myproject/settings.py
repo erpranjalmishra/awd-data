@@ -69,31 +69,16 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = get_env('DATABASE_URL')
-if DATABASE_URL:
-    # Expected format: postgres://user:pass@host:port/dbname
-    parsed = urlparse(DATABASE_URL)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': parsed.path.lstrip('/'),
-            'USER': parsed.username,
-            'PASSWORD': parsed.password,
-            'HOST': parsed.hostname,
-            'PORT': parsed.port or '5432',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myhealth',
+        'USER': 'pranjalmishra',
+        'PASSWORD': 'mZUjex0Ojs2u6tjFZfYQVZqcsnGry0Gl',
+        'HOST': 'dpg-d35tuh1r0fns73bfqslg-a',
+        'PORT': '5432',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': get_env('PGDATABASE', 'myhealth'),
-            'USER': get_env('PGUSER', 'pranjalmishra'),
-            'PASSWORD': get_env('PGPASSWORD', ''),
-            'HOST': get_env('PGHOST', 'dpg-d35tuh1r0fns73bfgslg-a.oregon-postgres.render.com'),
-            'PORT': get_env('PGPORT', '5432'),
-        }
-    }
+}
 
 
 # Password validation

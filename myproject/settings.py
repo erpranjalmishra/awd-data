@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import os
+import dj_database_url
 from urllib.parse import urlparse
 
 def get_env(name, default=None):
@@ -69,15 +70,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myhealth',
-        'USER': 'pranjalmishra',
-        'PASSWORD': 'mZUjex0Ojs2u6tjFZfYQVZqcsnGry0Gl',
-        'HOST': 'dpg-d35tuh1r0fns73bfqslg-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=get_env('DATABASE_URL', '')
+    )
 }
 
 

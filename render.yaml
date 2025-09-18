@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: |
       pip install -r requirements.txt
-      python manage.py migrate --noinput
+      python manage.py migrate --fake-initial --noinput
       python manage.py collectstatic --noinput
   startCommand: gunicorn myproject.wsgi:application --bind 0.0.0.0:$PORT
     autoDeploy: true

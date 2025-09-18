@@ -30,4 +30,5 @@ six==1.17.0
 smmap==5.0.2
 sqlparse==0.5.3
 streamlit==1.49.1
-
+psycopg
+psycopg2

@@ -34,7 +34,6 @@ pytz==2025.2
 referencing==0.36.2
 requests==2.32.3
 rpds-py==0.27.1
-samloader @ file:///C:/Users/x/samloader
 six==1.17.0
 smmap==5.0.2
 sqlparse==0.5.3
@@ -47,3 +46,5 @@ typing_extensions==4.15.0
 tzdata==2025.2
 urllib3==2.4.0
 watchdog==6.0.0
+gunicorn==23.0.0
+psycopg[binary]==3.2.1

@@ -1,6 +1,11 @@
 
 
 from pathlib import Path
+import os
+from urllib.parse import urlparse
+
+def get_env(name, default=None):
+    return os.environ.get(name, default)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,12 +15,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a4l5cew0uq7squ)6!mxts&d9qaeilwe$#19(p$42^pughkf@7e'
+SECRET_KEY = get_env('DJANGO_SECRET_KEY', 'dev-insecure-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_env('DJANGO_DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if h and not h.startswith('localhost') and not h.startswith('127.0.0.1')]
 
 
 # Application definition
@@ -63,16 +69,31 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'myhealth',
-        'USER': 'pranjalmishra',
-        'PASSWORD': 'mZUjex0Jjs2u6tjFZfYQVZqcsnGry0Gl',
-        'HOST': 'dpg-d35tuh1r0fns73bfgslg-a.oregon-postgres.render.com',
-        'PORT': '5432',
+DATABASE_URL = get_env('DATABASE_URL')
+if DATABASE_URL:
+    # Expected format: postgres://user:pass@host:port/dbname
+    parsed = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed.path.lstrip('/'),
+            'USER': parsed.username,
+            'PASSWORD': parsed.password,
+            'HOST': parsed.hostname,
+            'PORT': parsed.port or '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': get_env('PGDATABASE', 'myhealth'),
+            'USER': get_env('PGUSER', 'pranjalmishra'),
+            'PASSWORD': get_env('PGPASSWORD', ''),
+            'HOST': get_env('PGHOST', 'dpg-d35tuh1r0fns73bfgslg-a.oregon-postgres.render.com'),
+            'PORT': get_env('PGPORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -110,6 +131,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
+
+# Security headers (basic)
+if not DEBUG:
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

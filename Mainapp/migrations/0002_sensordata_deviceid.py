@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='sensordata',
+            model_name='Sensordata',
             name='deviceid',
             field=models.CharField(blank=True, default=None, max_length=40, null=True),
         ),

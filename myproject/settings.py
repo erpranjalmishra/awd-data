@@ -71,12 +71,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'SIH',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb+srv://ds8314880:dtRD1Dnvq0ggbHT0@cluster0.b2g3ln2.mongodb.net/SIH?retryWrites=true&w=majority&appName=Cluster0'
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myhealth',
+        'USER': 'pranjalmishra',
+        'PASSWORD': 'mZUjex0Ojs2u6tjFZfYQVZqcsnGry0Gl',
+        'HOST': 'dpg-d35tuh1r0fns73bfqslg-a.oregon-postgres.render.com',
+        'PORT': '5432',
     }
 }
 

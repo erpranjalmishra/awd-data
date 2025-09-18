@@ -33,4 +33,3 @@ streamlit==1.49.1
 psycopg
 psycopg2
 gunicorn
-djongo

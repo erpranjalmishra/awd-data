@@ -75,7 +75,7 @@ DATABASES = {
         'NAME': 'myhealth',
         'USER': 'pranjalmishra',
         'PASSWORD': 'mZUjex0Ojs2u6tjFZfYQVZqcsnGry0Gl',
-        'HOST': 'dpg-d35tuh1r0fns73bfqslg-a',
+        'HOST': 'dpg-d35tuh1r0fns73bfqslg-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }

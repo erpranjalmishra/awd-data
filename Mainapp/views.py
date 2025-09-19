@@ -8,7 +8,26 @@ import json
 from datetime import datetime
 from .models  import Sensordata
 def home(request):
-    return render(request, 'index.html')
+    """Simple home view with error handling"""
+    try:
+        return render(request, 'index.html')
+    except Exception as e:
+        print(f"Home view error: {str(e)}")
+        return JsonResponse({
+            'error': 'Template rendering failed',
+            'message': str(e),
+            'status': 'error'
+        }, status=500)
+
+@csrf_exempt
+def test_view(request):
+    """Minimal test view to isolate issues"""
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'Test view working',
+        'method': request.method,
+        'timestamp': datetime.now().isoformat()
+    })
 
 @csrf_exempt
 def health_check(request):

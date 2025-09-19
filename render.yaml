@@ -6,6 +6,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate --noinput
+      python manage.py populate_data --count 10
       python manage.py collectstatic --noinput
   startCommand: gunicorn myproject.wsgi:application --bind 0.0.0.0:$PORT
     autoDeploy: true
@@ -20,6 +21,8 @@ services:
         fromDatabase:
           name: sensors-postgres
           property: connectionString
+      - key: PYTHONPATH
+        value: /opt/render/project/src
 
 databases:
   - name: sensors-postgres

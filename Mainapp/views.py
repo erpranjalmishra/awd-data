@@ -5,9 +5,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import os
 import json
+from datetime import datetime
 from .models  import Sensordata
 def home(request):
     return render(request, 'index.html')
+
+def health_check(request):
+    """Simple health check endpoint"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Django server is running',
+        'timestamp': datetime.now().isoformat()
+    })
 
 def arduino_data(request):
     data_file = os.path.join(os.path.dirname(__file__), 'latest_data.txt')
@@ -104,13 +113,9 @@ def sensor_history(request):
 
 
 @csrf_exempt
-@require_http_methods(["GET"])
 def apisensordata(request):
     try:
-        print(f"DEBUG: Request method: {request.method}")
-        print(f"DEBUG: Request headers: {dict(request.headers)}")
         sensordata = Sensordata.objects.all().order_by('-id').first()
-        print(f"DEBUG: Found sensordata: {sensordata}")
         if sensordata:
             data = {
                 'temperature': sensordata.temp,

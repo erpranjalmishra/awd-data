@@ -23,6 +23,8 @@ services:
           property: connectionString
       - key: PYTHONPATH
         value: /opt/render/project/src
+      - key: PYTHONUNBUFFERED
+        value: 1
 
 databases:
   - name: sensors-postgres

@@ -10,13 +10,49 @@ from .models  import Sensordata
 def home(request):
     return render(request, 'index.html')
 
+@csrf_exempt
 def health_check(request):
-    """Simple health check endpoint"""
-    return JsonResponse({
-        'status': 'healthy',
-        'message': 'Django server is running',
-        'timestamp': datetime.now().isoformat()
-    })
+    """Comprehensive health check endpoint"""
+    try:
+        # Test database connection
+        db_status = "unknown"
+        db_count = 0
+        try:
+            db_count = Sensordata.objects.count()
+            db_status = "connected"
+        except Exception as e:
+            db_status = f"error: {str(e)}"
+        
+        # Test file system
+        file_status = "unknown"
+        try:
+            data_file = os.path.join(os.path.dirname(__file__), 'latest_data.txt')
+            file_status = "exists" if os.path.exists(data_file) else "missing"
+        except Exception as e:
+            file_status = f"error: {str(e)}"
+        
+        return JsonResponse({
+            'status': 'healthy',
+            'message': 'Django server is running',
+            'timestamp': datetime.now().isoformat(),
+            'database': {
+                'status': db_status,
+                'record_count': db_count
+            },
+            'files': {
+                'status': file_status
+            },
+            'environment': {
+                'debug': os.environ.get('DJANGO_DEBUG', 'not_set'),
+                'allowed_hosts': os.environ.get('ALLOWED_HOSTS', 'not_set')
+            }
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Health check failed: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }, status=500)
 
 def arduino_data(request):
     data_file = os.path.join(os.path.dirname(__file__), 'latest_data.txt')
@@ -114,23 +150,35 @@ def sensor_history(request):
 
 @csrf_exempt
 def apisensordata(request):
+    """
+    API endpoint for sensor data with comprehensive error handling
+    """
     try:
-        sensordata = Sensordata.objects.all().order_by('-id').first()
-        if sensordata:
-            data = {
-                'temperature': sensordata.temp,
-                'humidity': sensordata.humidity,
-                'ph': sensordata.phvalue,
-                'tds': sensordata.tds,
-                'o2': sensordata.o2,
-                "deviceid": sensordata.deviceid if sensordata.deviceid else "vikaspal@123",
-                "timestamp": sensordata.timestamp.isoformat() if sensordata.timestamp else None,
-                "status": "success",
-                "data_source": "database"
-            }
-        else:
+        # Log request for debugging
+        print(f"API Request: {request.method} from {request.META.get('REMOTE_ADDR', 'unknown')}")
+        
+        # Try to get data from database
+        try:
+            sensordata = Sensordata.objects.all().order_by('-id').first()
+            if sensordata:
+                data = {
+                    'temperature': float(sensordata.temp),
+                    'humidity': float(sensordata.humidity),
+                    'ph': float(sensordata.phvalue),
+                    'tds': float(sensordata.tds),
+                    'o2': float(sensordata.o2) if sensordata.o2 is not None else None,
+                    "deviceid": sensordata.deviceid if sensordata.deviceid else "vikaspal@123",
+                    "timestamp": sensordata.timestamp.isoformat() if sensordata.timestamp else None,
+                    "status": "success",
+                    "data_source": "database"
+                }
+                print(f"Database data found: {data['temperature']}°C")
+            else:
+                raise Sensordata.DoesNotExist("No sensor data found")
+                
+        except Exception as db_error:
+            print(f"Database error: {str(db_error)}")
             # Return dummy data when no real data is available
-            from datetime import datetime
             data = {
                 'temperature': 25.5,
                 'humidity': 60.0,
@@ -140,14 +188,16 @@ def apisensordata(request):
                 "deviceid": "vikaspal@123",
                 "timestamp": datetime.now().isoformat(),
                 "status": "success",
-                "data_source": "dummy"
+                "data_source": "dummy",
+                "warning": f"Database unavailable: {str(db_error)}"
             }
         
-        return JsonResponse(data)
+        return JsonResponse(data, status=200)
+        
     except Exception as e:
-        # Return dummy data even on database errors
-        from datetime import datetime
-        data = {
+        print(f"Critical API error: {str(e)}")
+        # Return fallback data even on critical errors
+        fallback_data = {
             'temperature': 22.0,
             'humidity': 55.0,
             'ph': 6.8,
@@ -155,8 +205,8 @@ def apisensordata(request):
             'o2': 20.5,
             "deviceid": "vikaspal@123",
             "timestamp": datetime.now().isoformat(),
-            "status": "success",
+            "status": "error",
             "data_source": "fallback",
-            "warning": f"Database error: {str(e)}"
+            "error": f"Critical error: {str(e)}"
         }
-        return JsonResponse(data)
+        return JsonResponse(fallback_data, status=200)  # Still return 200 to avoid 400 errors

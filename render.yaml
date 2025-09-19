@@ -15,7 +15,7 @@ services:
       - key: DJANGO_DEBUG
         value: False
       - key: ALLOWED_HOSTS
-        value: django-sensors.onrender.com
+        value: awd-data-6.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: sensors-postgres

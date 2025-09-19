@@ -5,6 +5,17 @@ import json
 import os
 from datetime import datetime
 import random
+import django
+import sys
+
+# Add the project directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Setup Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()
+
+from Mainapp.models import Sensordata
 
 # Change COM port and baudrate as needed
 SERIAL_PORT = 'COM6'  # Change this to your Arduino's COM port
@@ -103,6 +114,28 @@ def save_to_history(parsed_data):
     with open(HISTORY_FILE, 'w') as f:
         json.dump(history, f, indent=2)
 
+def save_to_database(parsed_data):
+    """Save parsed data to Django database"""
+    try:
+        # Only save if we have valid sensor data
+        if (parsed_data.get('temperature') is not None and 
+            parsed_data.get('humidity') is not None and 
+            parsed_data.get('ph') is not None and 
+            parsed_data.get('tds') is not None):
+            
+            Sensordata.objects.create(
+                deviceid="vikaspal@123",
+                temp=parsed_data['temperature'],
+                humidity=parsed_data['humidity'],
+                phvalue=parsed_data['ph'],
+                tds=parsed_data['tds'],
+                o2=parsed_data.get('o2'),
+                timestamp=datetime.now()
+            )
+            print(f"💾 Saved to database: Temp: {parsed_data['temperature']}°C | Humidity: {parsed_data['humidity']}% | pH: {parsed_data['ph']} | TDS: {parsed_data['tds']}ppm")
+    except Exception as e:
+        print(f"❌ Database save error: {e}")
+
 def try_connect_arduino():
     """Try to connect to Arduino quickly - if fails, start dummy data immediately"""
     print(f"Trying to connect to COM6...")
@@ -146,6 +179,7 @@ def read_from_arduino():
                         # Parse and save structured data
                         parsed_data = parse_arduino_data(line)
                         save_to_history(parsed_data)
+                        save_to_database(parsed_data)
                         
                 except UnicodeDecodeError:
                     continue
@@ -189,6 +223,7 @@ def create_dummy_data():
             'timestamp': datetime.now().isoformat()
         }
         save_to_history(dummy_data)
+        save_to_database(dummy_data)
         
         print(f"🔄 DUMMY: Temp: {dummy_temp}°C | Humidity: {dummy_humidity}% | pH: {dummy_ph} | TDS: {dummy_tds}ppm | O2: {dummy_o2}%")
         time.sleep(2)

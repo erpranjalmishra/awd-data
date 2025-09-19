@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=get_env('DATABASE_URL', '')
+        default=get_env('DATABASE_URL', 'sqlite:///db.sqlite3')
     )
 }
 

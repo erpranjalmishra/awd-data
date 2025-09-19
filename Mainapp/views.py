@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import os
 
@@ -17,6 +18,7 @@ def home(request):
     </html>
     """)
 
+@csrf_exempt
 def api(request):
     """Ultra-minimal API view"""
     return JsonResponse({
@@ -31,6 +33,7 @@ def api(request):
         'deviceid': 'vikaspal@123'
     })
 
+@csrf_exempt
 def health(request):
     """Ultra-minimal health check"""
     return JsonResponse({

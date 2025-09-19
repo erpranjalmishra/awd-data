@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: arduino-sensors-node
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: awd-data-6.onrender.com
+      - key: NODE_ENV
+        value: production

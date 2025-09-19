@@ -29,6 +29,7 @@ CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if h and not h.sta
 
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
     'Mainapp',
 ]
 

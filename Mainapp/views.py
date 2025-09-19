@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import os
 
+@csrf_exempt
 def home(request):
     """Ultra-minimal home view"""
     return HttpResponse("""
@@ -13,7 +14,7 @@ def home(request):
         <h1>Arduino Dashboard</h1>
         <p>Server is running!</p>
         <p>Time: """ + datetime.now().isoformat() + """</p>
-        <p><a href="/api/">API</a> | <a href="/health/">Health</a></p>
+        <p><a href="/api/">API</a> | <a href="/apidatasensor/">API Data Sensor</a> | <a href="/health/">Health</a></p>
     </body>
     </html>
     """)
@@ -40,6 +41,12 @@ def health(request):
         'status': 'healthy',
         'message': 'Server is running',
         'timestamp': datetime.now().isoformat(),
+        'request_info': {
+            'method': request.method,
+            'path': request.path,
+            'host': request.get_host(),
+            'user_agent': request.META.get('HTTP_USER_AGENT', 'unknown')
+        },
         'environment': {
             'debug': os.environ.get('DJANGO_DEBUG', 'not_set'),
             'allowed_hosts': os.environ.get('ALLOWED_HOSTS', 'not_set')

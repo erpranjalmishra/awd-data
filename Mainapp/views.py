@@ -1,77 +1,48 @@
 
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-import os
-import json
+from django.http import JsonResponse, HttpResponse
 from datetime import datetime
-from .models  import Sensordata
-def home(request):
-    """Simple home view with error handling"""
-    try:
-        return render(request, 'index.html')
-    except Exception as e:
-        print(f"Home view error: {str(e)}")
-        return JsonResponse({
-            'error': 'Template rendering failed',
-            'message': str(e),
-            'status': 'error'
-        }, status=500)
+import os
 
-@csrf_exempt
-def test_view(request):
-    """Minimal test view to isolate issues"""
+def home(request):
+    """Ultra-minimal home view"""
+    return HttpResponse("""
+    <!DOCTYPE html>
+    <html>
+    <head><title>Arduino Dashboard</title></head>
+    <body>
+        <h1>Arduino Dashboard</h1>
+        <p>Server is running!</p>
+        <p>Time: """ + datetime.now().isoformat() + """</p>
+        <p><a href="/api/">API</a> | <a href="/health/">Health</a></p>
+    </body>
+    </html>
+    """)
+
+def api(request):
+    """Ultra-minimal API view"""
     return JsonResponse({
         'status': 'ok',
-        'message': 'Test view working',
-        'method': request.method,
-        'timestamp': datetime.now().isoformat()
+        'message': 'API is working',
+        'timestamp': datetime.now().isoformat(),
+        'temperature': 25.5,
+        'humidity': 60.0,
+        'ph': 7.0,
+        'tds': 150.0,
+        'o2': 21.0,
+        'deviceid': 'vikaspal@123'
     })
 
-@csrf_exempt
-def health_check(request):
-    """Comprehensive health check endpoint"""
-    try:
-        # Test database connection
-        db_status = "unknown"
-        db_count = 0
-        try:
-            db_count = Sensordata.objects.count()
-            db_status = "connected"
-        except Exception as e:
-            db_status = f"error: {str(e)}"
-        
-        # Test file system
-        file_status = "unknown"
-        try:
-            data_file = os.path.join(os.path.dirname(__file__), 'latest_data.txt')
-            file_status = "exists" if os.path.exists(data_file) else "missing"
-        except Exception as e:
-            file_status = f"error: {str(e)}"
-        
-        return JsonResponse({
-            'status': 'healthy',
-            'message': 'Django server is running',
-            'timestamp': datetime.now().isoformat(),
-            'database': {
-                'status': db_status,
-                'record_count': db_count
-            },
-            'files': {
-                'status': file_status
-            },
-            'environment': {
-                'debug': os.environ.get('DJANGO_DEBUG', 'not_set'),
-                'allowed_hosts': os.environ.get('ALLOWED_HOSTS', 'not_set')
-            }
-        })
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Health check failed: {str(e)}',
-            'timestamp': datetime.now().isoformat()
-        }, status=500)
+def health(request):
+    """Ultra-minimal health check"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Server is running',
+        'timestamp': datetime.now().isoformat(),
+        'environment': {
+            'debug': os.environ.get('DJANGO_DEBUG', 'not_set'),
+            'allowed_hosts': os.environ.get('ALLOWED_HOSTS', 'not_set')
+        }
+    })
 
 def arduino_data(request):
     data_file = os.path.join(os.path.dirname(__file__), 'latest_data.txt')

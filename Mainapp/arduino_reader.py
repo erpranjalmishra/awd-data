@@ -82,31 +82,7 @@ def parse_arduino_data(raw_data):
                             data['tds'] = num_value
                     except ValueError:
                         continue
-        while True:
-            # Generate realistic dummy data
-            dummy_temp = round(20 + random.uniform(-5, 15), 1)
-            dummy_humidity = round(40 + random.uniform(-10, 20), 1)
-            dummy_ph = round(6.5 + random.uniform(-1, 1.5), 2)
-            dummy_tds = round(300 + random.uniform(-100, 200), 1)
-            dummy_distance = round(200 + random.uniform(-50, 50), 2)
-            dummy_o2 = round(random.uniform(85, 89), 1)
-            # Create data in your Arduino's format
-            raw_data = f"TDS: {dummy_tds} ppm | pH: {dummy_ph} | Distance: {dummy_distance} cm | Temp: {dummy_temp} C | Humidity: {dummy_humidity} % | O2: {dummy_o2} %"
-            # Save raw data
-            with open(DATA_FILE, 'w') as f:
-                f.write(raw_data)
-            # Parse and save structured data
-            dummy_data = {
-                'temperature': dummy_temp,
-                'humidity': dummy_humidity,
-                'ph': dummy_ph,
-                'tds': dummy_tds,
-                'o2': dummy_o2,
-                'timestamp': datetime.now().isoformat()
-            }
-            save_to_history(dummy_data)
-            print(f"🔄 DUMMY: Temp: {dummy_temp}°C | Humidity: {dummy_humidity}% | pH: {dummy_ph} | TDS: {dummy_tds}ppm | O2: {dummy_o2}%")
-            time.sleep(2)
+    return data
 
 def save_to_history(parsed_data):
     """Save parsed data to history file"""
@@ -215,20 +191,6 @@ def create_dummy_data():
         save_to_history(dummy_data)
         
         print(f"🔄 DUMMY: Temp: {dummy_temp}°C | Humidity: {dummy_humidity}% | pH: {dummy_ph} | TDS: {dummy_tds}ppm | O2: {dummy_o2}%")
-        time.sleep(2)
-        
-        # Parse and save structured data
-        dummy_data = {
-            'temperature': dummy_temp,
-            'humidity': dummy_humidity,
-            'ph': dummy_ph,
-            'tds': dummy_tds,
-            'o2': dummy_o2,
-            'timestamp': datetime.now().isoformat()
-        }
-        save_to_history(dummy_data)
-        
-        print(f"🔄 DUMMY: Temp: {dummy_temp}°C | Humidity: {dummy_humidity}% | pH: {dummy_ph} | TDS: {dummy_tds}ppm")
         time.sleep(2)
 
 def main():

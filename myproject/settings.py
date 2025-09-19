@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_env('DJANGO_SECRET_KEY', 'dev-insecure-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env('DJANGO_DEBUG', 'False').lower() == 'true'
+DEBUG = get_env('DJANGO_DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost,127.0.0.1,awd-data-6.onrender.com').split(',')
 CSRF_TRUSTED_ORIGINS = [f"https://{h}" for h in ALLOWED_HOSTS if h and not h.startswith('localhost') and not h.startswith('127.0.0.1')]

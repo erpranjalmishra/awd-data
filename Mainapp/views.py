@@ -1,6 +1,8 @@
 
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 import os
 import json
 from .models  import Sensordata
@@ -101,9 +103,14 @@ def sensor_history(request):
         return JsonResponse({'history': filtered_data, 'sensor': sensor_type})
 
 
+@csrf_exempt
+@require_http_methods(["GET"])
 def apisensordata(request):
     try:
+        print(f"DEBUG: Request method: {request.method}")
+        print(f"DEBUG: Request headers: {dict(request.headers)}")
         sensordata = Sensordata.objects.all().order_by('-id').first()
+        print(f"DEBUG: Found sensordata: {sensordata}")
         if sensordata:
             data = {
                 'temperature': sensordata.temp,
